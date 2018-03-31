@@ -13,9 +13,9 @@ type VisitsDAO struct {
 	Database string
 }
 
-// var db *mgo.Database
-
-var COLLECTIONS = "visits"
+const (
+	COLLECTIONS 	= "visits"
+)
 
 // Establish a connection to database
 func (m *VisitsDAO) Connect() {

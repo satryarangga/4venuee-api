@@ -15,6 +15,7 @@ import (
 
 var config = Config{}
 var dao = VisitsDAO{}
+var favDao = FavouritesDAO{}
 
 func CreateVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -44,6 +45,34 @@ func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, visit)
 }
 
+func CreateFavEndpoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var favourite Favourite
+	if err := json.NewDecoder(r.Body).Decode(&favourite); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	favourite.ID = bson.NewObjectId()
+    now := time.Now().Unix()
+	favourite.DateTime = now + 25200 // JAKARTA TIME
+	if err := favDao.Insert(favourite); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, favourite)
+}
+
+func FindFavEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	i, err := strconv.Atoi(params["id"])
+	favourite, err := favDao.FindByVenueId(i)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, favourite)
+}
+
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -69,7 +98,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/visits", CreateVisitEndpoint).Methods("POST")
 	r.HandleFunc("/visits/{id}", FindVisitEndpoint).Methods("GET")
-	r.HandleFunc("/count/{id}", FindVisitEndpoint).Methods("GET")
+	r.HandleFunc("/favourites", CreateFavEndpoint).Methods("POST")
+	r.HandleFunc("/favourites/{id}", FindFavEndpoint).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}
