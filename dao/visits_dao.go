@@ -40,6 +40,14 @@ func (m *VisitsDAO) FindById(id string) (Visit, error) {
 	return visit, err
 }
 
+// Find all visit for venue id
+func (m *VisitsDAO) FindByVenueId(id int) ([]Visit, error) {
+	var visits []Visit
+	err := db.C(COLLECTIONS).Find(bson.M{"venue_id":id}).All(&visits)
+	// err := db.C(COLLECTIONS).Find(bson.M{}).All(&visits)
+	return visits, err
+}
+
 // Insert a visit into database
 func (m *VisitsDAO) Insert(visit Visit) error {
 	err := db.C(COLLECTIONS).Insert(&visit)
