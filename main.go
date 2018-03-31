@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
+	"strconv"
 	"gopkg.in/mgo.v2/bson"
-
+	"time"
 	"github.com/gorilla/mux"
 	. "github.com/satryarangga/4venuee-api/config"
 	. "github.com/satryarangga/4venuee-api/dao"
@@ -16,7 +16,6 @@ import (
 var config = Config{}
 var dao = VisitsDAO{}
 
-// POST a new movie
 func CreateVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var visit Visit
@@ -25,11 +24,24 @@ func CreateVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	visit.ID = bson.NewObjectId()
+    now := time.Now().Unix()
+	visit.DateTime = now + 25200 // JAKARTA TIME
 	if err := dao.Insert(visit); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusCreated, visit)
+}
+
+func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	i, err := strconv.Atoi(params["id"])
+	visit, err := dao.FindByVenueId(i)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, visit)
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -56,6 +68,8 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/visits", CreateVisitEndpoint).Methods("POST")
+	r.HandleFunc("/visits/{id}", FindVisitEndpoint).Methods("GET")
+	r.HandleFunc("/count/{id}", FindVisitEndpoint).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}

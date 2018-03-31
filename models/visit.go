@@ -8,5 +8,5 @@ type Visit struct {
 	ID          bson.ObjectId `bson:"_id" json:"id"`
 	VenueId        int        `bson:"venue_id" json:"venue_id"`
 	CustomerId  int        `bson:"customer_id" json:"customer_id"`
-	DateTime bson.MongoTimestamp        `bson:"_timestamp" json:"timestamps,omitempty"`
+	DateTime int64        `bson:"unix_timestamp" json:"timestamps"`
 }
