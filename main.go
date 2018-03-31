@@ -73,6 +73,30 @@ func FindFavEndpoint(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, favourite)
 }
 
+func CheckCustomerFavEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	i, err := strconv.Atoi(params["id"])
+	c, err := strconv.Atoi(params["customerid"])
+	favourite, err := favDao.FindByVenueAndCustomer(i, c)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, favourite)
+}
+
+func DeleteCustomerFavEndPoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	i, err := strconv.Atoi(params["id"])
+	c, err := strconv.Atoi(params["customerid"])
+	err = favDao.Delete(i, c)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "No data found")
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -100,6 +124,8 @@ func main() {
 	r.HandleFunc("/visits/{id}", FindVisitEndpoint).Methods("GET")
 	r.HandleFunc("/favourites", CreateFavEndpoint).Methods("POST")
 	r.HandleFunc("/favourites/{id}", FindFavEndpoint).Methods("GET")
+	r.HandleFunc("/customer-favourites/{id}/{customerid}", FindFavEndpoint).Methods("GET")
+	r.HandleFunc("/customer-favourites-delete/{id}/{customerid}", DeleteCustomerFavEndPoint).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}

@@ -44,8 +44,14 @@ func (m *FavouritesDAO) FindById(id string) (Favourite, error) {
 func (m *FavouritesDAO) FindByVenueId(id int) ([]Favourite, error) {
 	var favourites []Favourite
 	err := db.C(COLLECTIONFAV).Find(bson.M{"venue_id":id}).All(&favourites)
-	// err := db.C(COLLECTIONFAV).Find(bson.M{}).All(&favourites)
 	return favourites, err
+}
+
+// Check if customer has favourites venue
+func (m *FavouritesDAO) FindByVenueAndCustomer(id int, customerid int) (Favourite, error) {
+	var favourite Favourite
+	err := db.C(COLLECTIONFAV).Find(bson.M{"venue_id":id, "customer_id":customerid}).One(&favourite)
+	return favourite, err
 }
 
 // Insert a favourite into database
@@ -55,8 +61,8 @@ func (m *FavouritesDAO) Insert(favourite Favourite) error {
 }
 
 // Delete an existing favourite
-func (m *FavouritesDAO) Delete(favourite Favourite) error {
-	err := db.C(COLLECTIONFAV).Remove(&favourite)
+func (m *FavouritesDAO) Delete(id int, customerid int) error {
+	err := db.C(COLLECTIONFAV).Remove(bson.M{"venue_id":id, "customer_id":customerid})
 	return err
 }
 
