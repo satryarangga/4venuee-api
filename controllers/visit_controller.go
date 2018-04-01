@@ -3,25 +3,32 @@ package controllers
 import (
 	"net/http"
 	"encoding/json"
-
+	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
+	"time"
+	"strconv"
 	. "github.com/satryarangga/4venuee-api/models"
+	. "github.com/satryarangga/4venuee-api/dao"
+	. "github.com/satryarangga/4venuee-api/helpers"
 )
+
+var dao = VisitsDAO{}
 
 func CreateVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var visit Visit
 	if err := json.NewDecoder(r.Body).Decode(&visit); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 	visit.ID = bson.NewObjectId()
     now := time.Now().Unix()
 	visit.DateTime = now + 25200 // JAKARTA TIME
 	if err := dao.Insert(visit); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, visit)
+	RespondWithJson(w, http.StatusCreated, visit)
 }
 
 func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +36,8 @@ func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(params["id"])
 	visit, err := dao.FindByVenueId(i)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
+		RespondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
 		return
 	}
-	respondWithJson(w, http.StatusOK, visit)
+	RespondWithJson(w, http.StatusOK, visit)
 }
