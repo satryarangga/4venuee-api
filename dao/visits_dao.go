@@ -13,6 +13,8 @@ type VisitsDAO struct {
 	Database string
 }
 
+var db *mgo.Database
+
 const (
 	COLLECTIONS 	= "visits"
 )
