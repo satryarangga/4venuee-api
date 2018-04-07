@@ -49,6 +49,15 @@ func (m *VisitsDAO) FindByVenueId(id int) ([]Visit, error) {
 	return visits, err
 }
 
+// Count all visit for venue id
+func (m *VisitsDAO) CountByVenueId(id int) (total int) {
+	totals, err := db.C(COLLECTIONS).Find(bson.M{"venue_id":id}).Count()
+	if err != nil {
+		return 0
+	}
+	return totals
+}
+
 // Insert a visit into database
 func (m *VisitsDAO) Insert(visit Visit) error {
 	err := db.C(COLLECTIONS).Insert(&visit)

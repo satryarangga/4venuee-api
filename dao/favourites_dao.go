@@ -46,6 +46,15 @@ func (m *FavouritesDAO) FindByVenueId(id int) ([]Favourite, error) {
 	return favourites, err
 }
 
+// Count all favourite for venue id
+func (m *FavouritesDAO) CountByVenueId(id int) (total int) {
+	totals, err := db.C(COLLECTIONFAV).Find(bson.M{"venue_id":id}).Count()
+	if err != nil {
+		return 0
+	}
+	return totals
+}
+
 // Check if customer has favourites venue
 func (m *FavouritesDAO) FindByVenueAndCustomer(id int, customerid int) (Favourite, error) {
 	var favourite Favourite

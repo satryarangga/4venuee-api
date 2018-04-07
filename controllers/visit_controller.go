@@ -28,7 +28,7 @@ func CreateVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	RespondWithJson(w, http.StatusCreated, visit)
+	RespondWithJson(w, http.StatusOK, visit, "Success to create visit")
 }
 
 func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -39,5 +39,16 @@ func FindVisitEndpoint(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
 		return
 	}
-	RespondWithJson(w, http.StatusOK, visit)
+	RespondWithJson(w, http.StatusOK, visit, "Success")
+}
+
+func CountVisitEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	i, err := strconv.Atoi(params["id"])
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "Invalid Venue ID")
+		return
+	}
+	visit:= dao.CountByVenueId(i)
+	RespondWithJson(w, http.StatusOK, visit, "Success")
 }

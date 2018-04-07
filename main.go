@@ -26,9 +26,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/visits", CreateVisitEndpoint).Methods("POST")
 	r.HandleFunc("/visits/{id}", FindVisitEndpoint).Methods("GET")
+	r.HandleFunc("/count-visits/{id}", CountVisitEndpoint).Methods("GET")
 	r.HandleFunc("/favourites", CreateFavEndpoint).Methods("POST")
 	r.HandleFunc("/favourites/{id}", FindFavEndpoint).Methods("GET")
-	r.HandleFunc("/customer-favourites/{id}/{customerid}", FindFavEndpoint).Methods("GET")
+	r.HandleFunc("/count-favourites/{id}", CountFavEndpoint).Methods("GET")
+	r.HandleFunc("/customer-favourites/{id}/{customerid}", CheckCustomerFavEndpoint).Methods("GET")
 	r.HandleFunc("/customer-favourites-delete/{id}/{customerid}", DeleteCustomerFavEndPoint).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
