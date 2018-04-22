@@ -9,6 +9,10 @@ import (
 type Config struct {
 	Server   string
 	Database string
+	MysqlServer   string
+	MysqlDatabase string
+	MysqlUser string
+	MysqlPassword string
 }
 
 // Read and parse the configuration file
