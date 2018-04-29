@@ -32,6 +32,10 @@ func main() {
 	r.HandleFunc("/count-favourites/{id}", CountFavEndpoint).Methods("GET")
 	r.HandleFunc("/customer-favourites/{id}/{customerid}", CheckCustomerFavEndpoint).Methods("GET")
 	r.HandleFunc("/customer-favourites-delete/{id}/{customerid}", DeleteCustomerFavEndPoint).Methods("GET")
+	r.HandleFunc("/chat", CreateChatEndpoint).Methods("POST")
+	r.HandleFunc("/chat/owner/{ownerid}", GetOwnerChatsEndpoint).Methods("GET")
+	r.HandleFunc("/chat/customer/{customerid}", GetCustomerChatsEndpoint).Methods("GET")
+	r.HandleFunc("/chat/conversation/{customerid}/{ownerid}", GetConversations).Methods("GET")
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal(err)
 	}
